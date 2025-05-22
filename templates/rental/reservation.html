@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Réserver - Location Simple{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <div class="d-flex align-items-center">
+                        <a href="{{ item.get_absolute_url }}" class="text-white me-3">
+                            <i class="bi bi-arrow-left"></i>
+                        </a>
+                        <h3 class="mb-0">Réserver cet article</h3>
+                    </div>
+                </div>
+                
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <!-- Item Preview -->
+                        <div class="col-lg-5">
+                            <div class="position-relative">
+                                {% if item.images.first %}
+                                    <img src="{{ item.images.first.image.url }}" 
+                                         class="img-fluid rounded-3 shadow-sm" 
+                                         alt="{{ item.title }}">
+                                {% else %}
+                                    <div class="bg-light rounded-3 d-flex align-items-center justify-content-center" 
+                                         style="height: 300px;">
+                                        <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                    </div>
+                                {% endif %}
+                                <div class="position-absolute top-0 start-0 m-3">
+                                    <span class="badge bg-primary bg-opacity-90 text-white px-3 py-2">
+                                        <i class="bi bi-tag me-1"></i> {{ item.category.name }}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <h2 class="h4 fw-bold">{{ item.title }}</h2>
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="text-warning me-2">
+                                        {% for _ in "12345" %}
+                                            <i class="bi bi-star-fill"></i>
+                                        {% endfor %}
+                                    </div>
+                                    <span class="text-muted small">(Aucun avis)</span>
+                                </div>
+                                <div class="d-flex align-items-center text-muted mb-3">
+                                    <i class="bi bi-person-circle me-2"></i>
+                                    <span>Proposé par {{ item.owner.get_full_name|default:item.owner.email }}</span>
+                                </div>
+                                <div class="d-flex align-items-center text-muted">
+                                    <i class="bi bi-geo-alt me-2"></i>
+                                    <span>Localisation</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Reservation Form -->
+                        <div class="col-lg-7">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body p-4">
+                                    <h4 class="fw-bold mb-4">Détails de la réservation</h4>
+                                    
+                                    <form method="post" class="needs-validation" novalidate>
+                                        {% csrf_token %}
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label for="start_date" class="form-label fw-medium">Date de début</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-light border-end-0">
+                                                        <i class="bi bi-calendar3"></i>
+                                                    </span>
+                                                    <input type="date" class="form-control ps-2" 
+                                                           id="start_date" name="start_date" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="end_date" class="form-label fw-medium">Date de fin</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-light border-end-0">
+                                                        <i class="bi bi-calendar3"></i>
+                                                    </span>
+                                                    <input type="date" class="form-control ps-2" 
+                                                           id="end_date" name="end_date" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-4">
+                                            <label for="message" class="form-label fw-medium">
+                                                Message au propriétaire <span class="text-muted">(optionnel)</span>
+                                            </label>
+                                            <textarea class="form-control" id="message" name="message" 
+                                                      rows="4" placeholder="Bonjour, je souhaiterais réserver cet article..."></textarea>
+                                        </div>
+                                        
+                                        <!-- Price Summary -->
+                                        <div class="bg-light p-3 rounded-3 mt-4">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span class="text-muted">Prix par jour</span>
+                                                <span class="fw-medium">{{ item.price_per_day }} €</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span class="text-muted">Durée</span>
+                                                <span class="fw-medium" id="duration">-</span>
+                                            </div>
+                                            <hr class="my-2">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="h5 mb-0 fw-bold">Total</span>
+                                                <span class="h4 mb-0 text-primary fw-bold" id="total-price">-</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-4 pt-2">
+                                            <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-bold">
+                                                <i class="bi bi-credit-card me-2"></i> Confirmer la réservation
+                                            </button>
+                                            <a href="{{ item.get_absolute_url }}" class="btn btn-outline-secondary w-100 mt-2">
+                                                Annuler
+                                            </a>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    }
+    .input-group-text {
+        background-color: #f8f9fa;
+    }
+    .card {
+        border-radius: 0.75rem;
+        overflow: hidden;
+    }
+    .card-header {
+        border-radius: 0.5rem 0.5rem 0 0 !important;
+    }
+    .btn-primary {
+        background: #0d6efd;
+        background: linear-gradient(90deg, #0d6efd 0%, #0b5ed7 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
+        const durationSpan = document.getElementById('duration');
+        const totalPriceSpan = document.getElementById('total-price');
+        const pricePerDay = parseFloat('{{ item.price_per_day|default:0 }}');
+        
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        startDateInput.min = today;
+        
+        // Update end date min date when start date changes
+        startDateInput.addEventListener('change', function() {
+            endDateInput.min = this.value;
+            if (endDateInput.value && new Date(endDateInput.value) < new Date(this.value)) {
+                endDateInput.value = '';
+                updatePrice();
+            } else {
+                updatePrice();
+            }
+        });
+        
+        // Update price when end date changes
+        endDateInput.addEventListener('change', updatePrice);
+        
+        function updatePrice() {
+            const startDate = new Date(startDateInput.value);
+            const endDate = new Date(endDateInput.value);
+            
+            if (startDateInput.value && endDateInput.value && startDate && endDate && startDate <= endDate) {
+                const diffTime = Math.abs(endDate - startDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end days
+                const totalPrice = diffDays * parseFloat(pricePerDay);
+                
+                durationSpan.textContent = `${diffDays} jour${diffDays > 1 ? 's' : ''}`;
+                totalPriceSpan.textContent = `${totalPrice.toFixed(2)} €`;
+            } else {
+                durationSpan.textContent = '-';
+                totalPriceSpan.textContent = '-';
+            }
+        }
+        
+        // Form validation
+        const form = document.querySelector('.needs-validation');
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+</script>
+{% endblock %}

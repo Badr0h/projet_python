@@ -1,0 +1,20 @@
+{% extends 'rental/auth_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block auth_title %}Créer un compte{% endblock %}
+
+{% block auth_subtitle %}Rejoignez notre communauté dès aujourd'hui{% endblock %}
+
+{% block auth_content %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <div class="d-grid gap-2 mt-4">
+        <button type="submit" class="btn btn-primary btn-lg">S'inscrire</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block auth_extra_links %}
+<p class="mb-0 mt-3">Déjà inscrit ? <a href="{% url 'login' %}">Connectez-vous ici</a></p>
+{% endblock %}
